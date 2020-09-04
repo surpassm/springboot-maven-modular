@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ysytech.tourism.auth.mapper.MenuMapper">
+
+    <resultMap id="ResultMapParentDTO" type="com.ysytech.tourism.auth.domain.MenuDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="menu_index" property="menuIndex"/>
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="describes" property="describes"/>
+        <result column="path" property="path"/>
+        <result column="menu_icon" property="menuIcon"/>
+        <result column="menu_url" property="menuUrl"/>
+    </resultMap>
+    <select id="findAllParent" resultMap="ResultMapParentDTO">
+        select * from menu where parent_id is null and is_delete = 0
+    </select>
+
+    <resultMap id="ResultMapChildesDTO" type="com.ysytech.tourism.auth.domain.MenuDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="menu_index" property="menuIndex"/>
+        <result column="type" property="type"/>
+        <result column="name" property="name"/>
+        <result column="describes" property="describes"/>
+        <result column="path" property="path"/>
+        <result column="menu_icon" property="menuIcon"/>
+        <result column="menu_url" property="menuUrl"/>
+        <collection property="childes" ofType="NewsLabel" select="findAllChild" column="id"/>
+    </resultMap>
+
+    <select id="findAllChild" resultMap = "ResultMapChildesDTO">
+        select * from menu where parent_id = #{parentId} and is_delete = 0
+    </select>
+
+    <select id="findByUserId" resultMap="ResultMapChildesDTO">
+        SELECT DISTINCT
+            (menu.id),
+            menu.describes,
+            menu.menu_icon,
+            menu.menu_index,
+            menu.menu_url,
+            menu.parent_id
+        FROM
+            menu menu
+        LEFT JOIN (
+            SELECT
+                powerMenu.menu_id
+            FROM
+                user_role userRole
+            LEFT JOIN role_power rolePower ON userRole.role_id = rolePower.role_id
+            LEFT JOIN power_menu powerMenu ON powerMenu.power_id = rolePower.power_id
+            WHERE
+                userRole.user_id = #{userId}
+        ) menus ON menus.menu_id = menu.id
+        WHERE
+
+    </select>
+</mapper>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ysytech.tourism.auth.mapper.DepartmentMapper">
+
+    <resultMap id="ResultMapParentDTO" type="com.ysytech.tourism.auth.domain.DepartmentDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="department_index" property="departmentIndex"/>
+        <result column="name" property="name"/>
+    </resultMap>
+    <select id="findAllParent" resultMap="ResultMapParentDTO">
+        select * from department where parent_id is null and is_delete = 0
+    </select>
+
+    <resultMap id="ResultMapChildesDTO" type="com.ysytech.tourism.auth.domain.DepartmentDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="department_index" property="departmentIndex"/>
+        <result column="name" property="name"/>
+        <collection property="childes" ofType="NewsLabel" select="findAllChild" column="id"/>
+    </resultMap>
+
+    <select id="findAllChild" resultMap = "ResultMapChildesDTO">
+        select * from department where parent_id = #{parentId} and is_delete = 0
+    </select>
+
+
+
+    <select id="pageQueryDepartmentPerson" resultType="com.ysytech.tourism.auth.entity.UserInfo">
+        SELECT
+            ui.id,
+            ui.username,
+            ui.head_url,
+            ui.type_enum,
+            ui.user_info_index
+        FROM
+            user_info ui
+        LEFT JOIN department_user_info du ON ui.id = du.user_id
+        WHERE
+            du.department_id = #{departmentId}
+    </select>
+</mapper>

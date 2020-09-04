@@ -1,0 +1,49 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: @project.artifactId@
+  datasource:
+    url: jdbc:mysql://localhost:3306/tourism?serverTimezone=Hongkong&useSSL=false&useUnicode=true&characterEncoding=UTF-8&nullCatalogMeansCurrent=true
+    hikari:
+      username: root
+      password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: update
+    database: mysql
+    properties:
+      hibernate:
+        format_sql: false
+    database-platform: org.hibernate.dialect.MySQL5InnoDBDialect
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+  session:
+    store-type: none
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+
+swagger:
+  enabled: true
+  title: "框架 API"
+  authorization:
+    key-name: Authorization #head对应的key
+    auth-regex: ^(?!auth).*$ #url地址中携带auth将不加入swagger token验证
+  base-package: com.ysytech.tourism.api.controller
+  description: "说明"
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+logging:
+  level:
+    com.ysytech.tourism: trace
+  file:
+    name: record/logs/${spring.application.name}.log

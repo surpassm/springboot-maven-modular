@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ysytech.tourism.auth.mapper.OperationsMapper">
+
+    <resultMap id="ResultMapParentDTO" type="com.ysytech.tourism.auth.domain.OperationsDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="department_index" property="describes"/>
+        <result column="name" property="name"/>
+        <result column="describes" property="describes"/>
+        <result column="apiUrl" property="apiUrl"/>
+    </resultMap>
+    <select id="findAllParent" resultMap="ResultMapParentDTO">
+        select * from operations where parent_id is null and is_delete = 0
+    </select>
+
+    <resultMap id="ResultMapChildesDTO" type="com.ysytech.tourism.auth.domain.OperationsDTO">
+        <id column="id" property="id" jdbcType="BIGINT"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="department_index" property="describes"/>
+        <result column="name" property="name"/>
+        <result column="describes" property="describes"/>
+        <result column="apiUrl" property="apiUrl"/>
+        <collection property="childes" ofType="NewsLabel" select="findAllChild" column="id"/>
+    </resultMap>
+
+    <select id="findAllChild" resultMap = "ResultMapChildesDTO">
+        select * from operations where parent_id = #{parentId} and is_delete = 0
+    </select>
+
+    <select id="findByUserId" resultType="com.ysytech.tourism.auth.entity.Operations">
+        SELECT DISTINCT
+            (operations.id),
+            operations.api_url,
+            operations.`name`
+        FROM
+            operations operations
+        LEFT JOIN (
+            SELECT
+                powerOperations.operations_id
+            FROM
+                user_role userRole
+            LEFT JOIN role_power rolePower ON userRole.role_id = rolePower.role_id
+            LEFT JOIN power_operations powerOperations ON powerOperations.power_id = rolePower.power_id
+            WHERE
+                userRole.user_id = #{userId}
+        ) operationses ON operationses.operations_id = operations.id
+        WHERE
+            operations.is_delete = 0
+
+    </select>
+</mapper>
